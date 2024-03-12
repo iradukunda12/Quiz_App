@@ -2,14 +2,14 @@ import 'dart:async';
 import 'package:flashcards_quiz/views/quiz_screen.dart';
 import 'package:flutter/material.dart';
 
-import '../models/layout_questions_model.dart';
-
 class MyProgressIndicator extends StatefulWidget {
-  final List<QuestionData> questionlenght;
+  final List<dynamic> questionlenght;
+  final dynamic optionsList;
   final String topicType;
   const MyProgressIndicator({
     super.key,
     required this.questionlenght,
+    required this.optionsList,
     required this.topicType,
   });
 
@@ -41,11 +41,11 @@ class _MyProgressIndicatorState extends State<MyProgressIndicator> {
   }
 
   void navigateToNewScreen() {
-    Navigator.pushReplacement(
-      context,
+    Navigator.of(context).pushReplacement(
       MaterialPageRoute(
         builder: (context) => QuizScreen(
-          questions: layOutQuestionsList,
+          questionlenght: widget.questionlenght,
+          optionsList: widget.optionsList,
           topicType: widget.topicType,
         ),
       ),

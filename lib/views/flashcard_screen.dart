@@ -1,5 +1,4 @@
 import 'package:appinio_swiper/appinio_swiper.dart';
-import 'package:flashcards_quiz/models/layout_questions_model.dart';
 import 'package:flashcards_quiz/views/quiz_screen.dart';
 import 'package:flashcards_quiz/widgets/flash_card_widget.dart';
 import 'package:flashcards_quiz/widgets/linear_progress_indicator_widget.dart';
@@ -9,9 +8,9 @@ import 'dart:math';
 
 class NewCard extends StatefulWidget {
   final String topicName;
-  final List<QuestionData> questionData;
+  final List<dynamic> typeOfTopic;
   const NewCard(
-      {super.key, required this.topicName, required this.questionData});
+      {super.key, required this.topicName, required this.typeOfTopic});
 
   @override
   State<NewCard> createState() => _NewCardState();
@@ -27,9 +26,11 @@ class _NewCardState extends State<NewCard> {
     const Color cardColor = Color(0xFF4993FA);
 
     // Get a list of 4 randomly selected Questions objects
-    final questions = getRandomQuestionsAndOptions(widget.questionData);
+    Map<dynamic, dynamic> randomQuestionsMap =
+        getRandomQuestionsAndOptions(widget.typeOfTopic, 4);
 
-    // dynamic randomOptions = randomQuestionsMap.values.toList();
+    List<dynamic> randomQuestions = randomQuestionsMap.keys.toList();
+    dynamic randomOptions = randomQuestionsMap.values.toList();
 
     return Scaffold(
       backgroundColor: bgColor3,
@@ -60,7 +61,8 @@ class _NewCardState extends State<NewCard> {
                       ),
                     ),
                     MyProgressIndicator(
-                      questionlenght: questions,
+                      questionlenght: randomQuestions,
+                      optionsList: randomOptions,
                       topicType: widget.topicName,
                     ),
                   ],
@@ -79,18 +81,15 @@ class _NewCardState extends State<NewCard> {
                   unswipe: _unswipe,
                   onSwipe: _swipe,
                   onEnd: _onEnd,
-                  cardsCount: questions.length,
+                  cardsCount: randomQuestions.length,
                   cardsBuilder: (BuildContext context, int index) {
-                    var cardIndex = questions[index];
+                    var cardIndex = randomQuestions[index];
                     return FlipCardsWidget(
                       bgColor: cardColor,
-                      cardsLenght: questions.length,
+                      cardsLenght: randomQuestions.length,
                       currentIndex: index + 1,
-                      answer: (cardIndex.options as List<QuestionOptions>)
-                              .firstWhere((element) => element.isCorrect)
-                              .text ??
-                          '',
-                      question: cardIndex.question,
+                      answer: cardIndex.correctAnswer.text,
+                      question: cardIndex.text,
                       currentTopic: widget.topicName,
                     );
                   },
@@ -128,11 +127,11 @@ class _NewCardState extends State<NewCard> {
                       elevation: MaterialStateProperty.all(4),
                     ),
                     onPressed: () {
-                      Navigator.pushReplacement(
-                        context,
+                      Navigator.of(context).pushReplacement(
                         MaterialPageRoute(
                           builder: (context) => QuizScreen(
-                            questions: layOutQuestionsList,
+                            questionlenght: randomQuestions,
+                            optionsList: randomOptions,
                             topicType: widget.topicName,
                           ),
                         ),
@@ -157,26 +156,29 @@ class _NewCardState extends State<NewCard> {
   }
 }
 
-List<QuestionData> getRandomQuestionsAndOptions(
-  List<QuestionData> allQuestions,
+Map<dynamic, dynamic> getRandomQuestionsAndOptions(
+  List<dynamic> allQuestions,
+  int count,
 ) {
-  final randomQuestions = <QuestionData>[];
+  final randomQuestions = <dynamic>[];
+  final randomOptions = <dynamic>[];
   final random = Random();
 
-  int count = allQuestions.length;
+  if (count >= allQuestions.length) {
+    count = allQuestions.length;
+  }
 
   while (randomQuestions.length < count) {
     final randomIndex = random.nextInt(allQuestions.length);
     final selectedQuestion = allQuestions[randomIndex];
 
-    if (!randomQuestions
-        .map((e) => e.question)
-        .contains(selectedQuestion.question)) {
+    if (!randomQuestions.contains(selectedQuestion)) {
       randomQuestions.add(selectedQuestion);
+      randomOptions.add(selectedQuestion.options);
     }
   }
 
-  return randomQuestions;
+  return Map.fromIterables(randomQuestions, randomOptions);
 }
 
 // List<dynamic> getRandomQuestions(List<dynamic> allQuestions, int count) {

@@ -1,17 +1,9 @@
 import 'package:flashcards_quiz/main.dart';
 import 'package:flashcards_quiz/models/flutter_topics_model.dart';
 import 'package:flashcards_quiz/views/flashcard_screen.dart';
-import 'package:flashcards_quiz/views/navigation.dart';
-import 'package:flashcards_quiz/views/statemanagement.dart';
-import 'package:flashcards_quiz/views/widgetview.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:quickalert/quickalert.dart';
-
-import 'package:flashcards_quiz/views/results_screen.dart';
-
-import 'categoryview.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -21,6 +13,7 @@ class HomePage extends StatelessWidget {
     const Color bgColor = Color(0xFF4993FA);
     const Color bgColor3 = Color(0xFF5170FD);
     return Builder(builder: (context) {
+      SupabaseConfig.client.auth.signOut();
       return Scaffold(
         backgroundColor: bgColor3,
         body: SafeArea(
@@ -29,16 +22,6 @@ class HomePage extends StatelessWidget {
             child: ListView(
               physics: const BouncingScrollPhysics(),
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    IconButton(onPressed: (){
-                      SupabaseConfig.client.auth.signOut();
-
-                    }, icon: const Icon(Icons.logout_outlined,color: Colors.red,size: 24,))
-                  ],
-                ),
-                const SizedBox(height: 16,),
                 Container(
                   decoration: BoxDecoration(
                     color: bgColor3,
@@ -110,7 +93,8 @@ class HomePage extends StatelessWidget {
                           context,
                           MaterialPageRoute(
                             builder: (context) => NewCard(
-                              topicName: topicsData.topicName, questionData: topicsData.topicQuestions,
+                              typeOfTopic: topicsData.topicQuestions,
+                              topicName: topicsData.topicName,
                             ),
                           ),
                         );
@@ -157,45 +141,25 @@ class HomePage extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                              if (isAdmin)
-                                Positioned(
-                                  top: 10,
-                                  right: 0,
-                                  left: 8,
-                                  child: Row(
-                                    children: [
-                                      GestureDetector(
-                                        onTap: () {
-                                          QuickAlert.show(
-                                            context: context,
-                                            type: QuickAlertType.success,
-                                            text:
-                                                'lets check the ${topicsData.topicName} Questions so that we can Edit & Delete & Create!',
-                                            title: topicsData.topicName,
-                                            confirmBtnText: "Okay",
-                                            confirmBtnColor: bgColor3,
-                                            onConfirmBtnTap: () {
-                                              Navigator.pop(context);
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      WidgetView(topicsData.topicName),
-                                                ),
-                                              );
-                                              print("Hello world it's ");
-                                            },
-                                          );
-                                        },
-                                        child: Icon(
-                                          Icons.menu,
-                                          color: Colors.white,
-                                          size: 30,
-                                        ),
+                              Positioned(
+                                top: 10,
+                                right: 0,
+                                left: 8,
+                                child: Row(
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () {
+                                        print("press all");
+                                      },
+                                      child: Icon(
+                                        Icons.menu,
+                                        color: Colors.white,
+                                        size: 30,
                                       ),
-                                    ],
-                                  ),
+                                    ),
+                                  ],
                                 ),
+                              ),
                             ],
                           ),
                         ),
@@ -206,18 +170,6 @@ class HomePage extends StatelessWidget {
               ],
             ),
           ),
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => CategoryView(),
-              ),
-            );
-          },
-          child: Icon(Icons.add),
-          backgroundColor: Colors.green,
         ),
       );
     });

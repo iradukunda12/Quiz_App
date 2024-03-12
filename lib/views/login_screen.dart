@@ -108,7 +108,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void onSignInComplete(AuthResponse response) async {
     String? uuid = response.user?.id;
-    String? email = response.user?.email;
 
     showCustomProgressBar(context);
     // Check online record and update to local database
@@ -125,7 +124,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   //  Check if saving operation was success
                   if (saved) {
                         closeCustomProgressBar(context);
-                        isAdmin = adminEmail == email;
                         goToSecondaryPage();
 
                   } else {
