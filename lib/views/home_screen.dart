@@ -168,7 +168,7 @@ class HomePage extends StatelessWidget {
                                               context,
                                               MaterialPageRoute(
                                                 builder: (context) =>
-                                                    StateManagementView(),
+                                                    WidgetView(),
                                               ),
                                             );
                                             print("Hello world it's works");
