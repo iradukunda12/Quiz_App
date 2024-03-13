@@ -1,9 +1,15 @@
 import 'package:flashcards_quiz/main.dart';
 import 'package:flashcards_quiz/models/flutter_topics_model.dart';
 import 'package:flashcards_quiz/views/flashcard_screen.dart';
+import 'package:flashcards_quiz/views/navigation.dart';
+import 'package:flashcards_quiz/views/statemanagement.dart';
+import 'package:flashcards_quiz/views/widgetview.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:quickalert/quickalert.dart';
+
+import 'package:flashcards_quiz/views/results_screen.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -149,7 +155,25 @@ class HomePage extends StatelessWidget {
                                   children: [
                                     GestureDetector(
                                       onTap: () {
-                                        print("press all");
+                                        QuickAlert.show(
+                                          context: context,
+                                          type: QuickAlertType.success,
+                                          text:
+                                              'lets check the widget Questions so that we can Edit & Delete & Create!',
+                                          title: "Widget Category",
+                                          confirmBtnText: "Okay",
+                                          confirmBtnColor: bgColor3,
+                                          onConfirmBtnTap: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    StateManagementView(),
+                                              ),
+                                            );
+                                            print("Hello world it's works");
+                                          },
+                                        );
                                       },
                                       child: Icon(
                                         Icons.menu,
