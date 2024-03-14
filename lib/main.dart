@@ -11,6 +11,9 @@ import 'package:hive_flutter/adapters.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 
+bool isAdmin = false;
+String adminEmail = 'admin@gmail.com';
+
 void main() async {
 
   WidgetsFlutterBinding.ensureInitialized();

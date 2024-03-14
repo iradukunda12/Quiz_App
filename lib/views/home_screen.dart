@@ -147,7 +147,7 @@ class HomePage extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                              Positioned(
+                             if(isAdmin)Positioned(
                                 top: 10,
                                 right: 0,
                                 left: 8,
