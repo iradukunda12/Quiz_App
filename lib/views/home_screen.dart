@@ -159,8 +159,8 @@ class HomePage extends StatelessWidget {
                                           context: context,
                                           type: QuickAlertType.success,
                                           text:
-                                              'lets check the widget Questions so that we can Edit & Delete & Create!',
-                                          title: "Widget Category",
+                                              'lets check the ${topicsData.topicName} Questions so that we can Edit & Delete & Create!',
+                                          title: topicsData.topicName,
                                           confirmBtnText: "Okay",
                                           confirmBtnColor: bgColor3,
                                           onConfirmBtnTap: () {
