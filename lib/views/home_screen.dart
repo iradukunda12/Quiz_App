@@ -171,7 +171,7 @@ class HomePage extends StatelessWidget {
                                                     WidgetView(),
                                               ),
                                             );
-                                            print("Hello world it's works");
+                                            print("Hello world it's ");
                                           },
                                         );
                                       },
