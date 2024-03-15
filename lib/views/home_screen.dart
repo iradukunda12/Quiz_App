@@ -21,7 +21,6 @@ class HomePage extends StatelessWidget {
     const Color bgColor = Color(0xFF4993FA);
     const Color bgColor3 = Color(0xFF5170FD);
     return Builder(builder: (context) {
-      SupabaseConfig.client.auth.signOut();
       return Scaffold(
         backgroundColor: bgColor3,
         body: SafeArea(
@@ -30,6 +29,16 @@ class HomePage extends StatelessWidget {
             child: ListView(
               physics: const BouncingScrollPhysics(),
               children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    IconButton(onPressed: (){
+                      SupabaseConfig.client.auth.signOut();
+
+                    }, icon: const Icon(Icons.logout_outlined,color: Colors.red,size: 24,))
+                  ],
+                ),
+                const SizedBox(height: 16,),
                 Container(
                   decoration: BoxDecoration(
                     color: bgColor3,
@@ -167,6 +176,7 @@ class HomePage extends StatelessWidget {
                                             confirmBtnText: "Okay",
                                             confirmBtnColor: bgColor3,
                                             onConfirmBtnTap: () {
+                                              Navigator.pop(context);
                                               Navigator.push(
                                                 context,
                                                 MaterialPageRoute(
