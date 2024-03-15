@@ -2,6 +2,7 @@ import 'package:flashcards_quiz/main.dart';
 import 'package:flashcards_quiz/models/flutter_topics_model.dart';
 import 'package:flashcards_quiz/views/flashcard_screen.dart';
 import 'package:flashcards_quiz/views/navigation.dart';
+import 'package:flashcards_quiz/views/signup_screen.dart';
 import 'package:flashcards_quiz/views/statemanagement.dart';
 import 'package:flashcards_quiz/views/widgetview.dart';
 import 'package:flutter/cupertino.dart';
@@ -33,7 +34,11 @@ class HomePage extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     IconButton(onPressed: (){
-                      SupabaseConfig.client.auth.signOut();
+                      showCustomProgressBar(context);
+                      SupabaseConfig.client.auth.signOut().then((value){
+                        closeCustomProgressBar(context);
+                        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=> SignupScreen()),(a) => false);
+                      });
 
                     }, icon: const Icon(Icons.logout_outlined,color: Colors.red,size: 24,))
                   ],
