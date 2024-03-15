@@ -6,6 +6,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
+import '../models/flutter_topics_model.dart';
+
 class QuizScreen extends StatefulWidget {
   final String topicType;
   final List<QuestionData> questionData;

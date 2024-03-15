@@ -148,71 +148,7 @@
 //   ),
 // ];
 
-class QuestionData {
-  final String question;
-  final List<QuestionOptions> options;
-  bool isLocked;
-
-  QuestionData({
-    required this.question,
-    required this.options,
-    this.isLocked = false,
-  });
-
-  QuestionData copyWith() {
-    return QuestionData(
-      question: question,
-      options: options
-          .map(
-            (option) =>
-                QuestionOptions(text: option.text, isCorrect: option.isCorrect),
-          )
-          .toList(),
-      isLocked: isLocked,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'question': question,
-      'options': options.map((option) => option.toJson()).toList(),
-      'isLocked': isLocked,
-    };
-  }
-
-  factory QuestionData.fromJson(Map<String, dynamic> json) {
-    return QuestionData(
-      question: json['text'],
-      options: List<QuestionOptions>.from(
-          json['options'].map((option) => QuestionOptions.fromJson(option))),
-      isLocked: json['isLocked'],
-    );
-  }
-}
-
-class QuestionOptions {
-  final String text;
-  final bool isCorrect;
-
-  const QuestionOptions({
-    required this.text,
-    required this.isCorrect,
-  });
-
-  Map<String, dynamic> toJson() {
-    return {
-      'text': text,
-      'isCorrect': isCorrect,
-    };
-  }
-
-  factory QuestionOptions.fromJson(Map<String, dynamic> json) {
-    return QuestionOptions(
-      text: json['text'],
-      isCorrect: json['isCorrect'],
-    );
-  }
-}
+import 'flutter_topics_model.dart';
 
 final layOutQuestionsList = [
   QuestionData(
