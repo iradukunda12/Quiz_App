@@ -187,7 +187,7 @@ class HomePage extends StatelessWidget {
                                             },
                                           );
                                         },
-                                        child: Icon(
+                                        child: const Icon(
                                           Icons.menu,
                                           color: Colors.white,
                                           size: 30,
@@ -207,7 +207,7 @@ class HomePage extends StatelessWidget {
             ),
           ),
         ),
-        floatingActionButton: FloatingActionButton(
+        floatingActionButton: (isAdmin) ? FloatingActionButton(
           onPressed: () {
             Navigator.push(
               context,
@@ -216,9 +216,9 @@ class HomePage extends StatelessWidget {
               ),
             );
           },
-          child: Icon(Icons.add),
           backgroundColor: Colors.green,
-        ),
+          child: const Icon(Icons.add),
+        ) : const SizedBox(),
       );
     });
   }
