@@ -11,6 +11,8 @@ import 'package:quickalert/quickalert.dart';
 
 import 'package:flashcards_quiz/views/results_screen.dart';
 
+import 'categoryview.dart';
+
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
@@ -147,43 +149,44 @@ class HomePage extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                             if(isAdmin)Positioned(
-                                top: 10,
-                                right: 0,
-                                left: 8,
-                                child: Row(
-                                  children: [
-                                    GestureDetector(
-                                      onTap: () {
-                                        QuickAlert.show(
-                                          context: context,
-                                          type: QuickAlertType.success,
-                                          text:
-                                              'lets check the ${topicsData.topicName} Questions so that we can Edit & Delete & Create!',
-                                          title: topicsData.topicName,
-                                          confirmBtnText: "Okay",
-                                          confirmBtnColor: bgColor3,
-                                          onConfirmBtnTap: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    WidgetView(),
-                                              ),
-                                            );
-                                            print("Hello world it's ");
-                                          },
-                                        );
-                                      },
-                                      child: Icon(
-                                        Icons.menu,
-                                        color: Colors.white,
-                                        size: 30,
+                              if (isAdmin)
+                                Positioned(
+                                  top: 10,
+                                  right: 0,
+                                  left: 8,
+                                  child: Row(
+                                    children: [
+                                      GestureDetector(
+                                        onTap: () {
+                                          QuickAlert.show(
+                                            context: context,
+                                            type: QuickAlertType.success,
+                                            text:
+                                                'lets check the ${topicsData.topicName} Questions so that we can Edit & Delete & Create!',
+                                            title: topicsData.topicName,
+                                            confirmBtnText: "Okay",
+                                            confirmBtnColor: bgColor3,
+                                            onConfirmBtnTap: () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      WidgetView(),
+                                                ),
+                                              );
+                                              print("Hello world it's ");
+                                            },
+                                          );
+                                        },
+                                        child: Icon(
+                                          Icons.menu,
+                                          color: Colors.white,
+                                          size: 30,
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
-                              ),
                             ],
                           ),
                         ),
@@ -194,6 +197,18 @@ class HomePage extends StatelessWidget {
               ],
             ),
           ),
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => CategoryView(),
+              ),
+            );
+          },
+          child: Icon(Icons.add),
+          backgroundColor: Colors.green,
         ),
       );
     });
