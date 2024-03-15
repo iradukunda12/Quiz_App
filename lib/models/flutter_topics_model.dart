@@ -11,7 +11,7 @@ class FlutterTopics {
   final String topicName;
   final IconData topicIcon;
   final Color topicColor;
-  final List<dynamic> topicQuestions;
+  final List<QuestionData> topicQuestions;
 
   FlutterTopics({
     required this.id,

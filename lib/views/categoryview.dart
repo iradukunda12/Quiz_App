@@ -1,4 +1,6 @@
 import 'package:flashcards_quiz/main.dart';
+import 'package:flashcards_quiz/utils/utils.dart';
+import 'package:flashcards_quiz/views/widgetview.dart';
 import 'package:flutter/material.dart';
 
 import 'registerquestions.dart';
@@ -25,6 +27,8 @@ class FormScreen extends StatefulWidget {
 
 class _FormScreenState extends State<FormScreen> {
   String? _selectedCategory;
+
+  TextEditingController _categoryController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -61,41 +65,59 @@ class _FormScreenState extends State<FormScreen> {
                     width: 2.0,
                   ),
                 ),
-                child: DropdownButtonFormField<String>(
-                  iconDisabledColor: Colors.white,
-                  dropdownColor: Colors.white,
-                  value: _selectedCategory,
-                  hint: Text(
-                    'Select a category',
-                    style: TextStyle(color: Colors.white),
+                child:
+
+                TextField(
+                  controller: _categoryController,
+                  decoration: InputDecoration(
+                    hintText: 'Enter your question',
                   ),
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      _selectedCategory = newValue;
-                    });
-                  },
-                  items: <String>[
-                    'Widget',
-                    'StateManagement',
-                    'layout & ui',
-                    'Navigation',
-                  ].map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
                 ),
+                // DropdownButtonFormField<String>(
+                //   iconDisabledColor: Colors.white,
+                //   dropdownColor: Colors.white,
+                //   value: _selectedCategory,
+                //   hint: Text(
+                //     'Select a category',
+                //     style: TextStyle(color: Colors.white),
+                //   ),
+                //   onChanged: (String? newValue) {
+                //     setState(() {
+                //       _selectedCategory = newValue;
+                //     });
+                //   },
+                //   items: <String>[
+                //     'Widget',
+                //     'StateManagement',
+                //     'layout & ui',
+                //     'Navigation',
+                //   ].map<DropdownMenuItem<String>>((String value) {
+                //     return DropdownMenuItem<String>(
+                //       value: value,
+                //       child: Text(value),
+                //     );
+                //   }).toList(),
+                // ),
+
+
+
+
+
               ),
               SizedBox(height: 20.0),
               ElevatedButton(
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => RegisterQuestion(),
-                    ),
-                  );
+
+                  if(_categoryController.text.isNotEmpty) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => WidgetView(_categoryController.text),
+                      ),
+                    );
+                  }else{
+                    showSnackBar(context, "Enter the category name");
+                  }
                 },
                 child: Text(
                   'Proceed to Question',

@@ -110,8 +110,7 @@ class HomePage extends StatelessWidget {
                           context,
                           MaterialPageRoute(
                             builder: (context) => NewCard(
-                              typeOfTopic: topicsData.topicQuestions,
-                              topicName: topicsData.topicName,
+                              topicName: topicsData.topicName, questionData: topicsData.topicQuestions,
                             ),
                           ),
                         );
@@ -181,7 +180,7 @@ class HomePage extends StatelessWidget {
                                                 context,
                                                 MaterialPageRoute(
                                                   builder: (context) =>
-                                                      WidgetView(),
+                                                      WidgetView(topicsData.topicName),
                                                 ),
                                               );
                                               print("Hello world it's ");

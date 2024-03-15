@@ -1,17 +1,17 @@
 import 'dart:async';
 
+import 'package:flashcards_quiz/models/layout_questions_model.dart';
 import 'package:flashcards_quiz/views/results_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 class QuizScreen extends StatefulWidget {
   final String topicType;
-  final List<dynamic> questionlenght;
-  final dynamic optionsList;
+  final List<QuestionData> questionData;
   const QuizScreen(
       {super.key,
-      required this.questionlenght,
-      required this.optionsList,
+      required this.questionData,
       required this.topicType});
 
   @override
@@ -47,7 +47,7 @@ class _QuizScreenState extends State<QuizScreen> {
   }
 
   void navigateToNewScreen() {
-    if (_questionNumber < widget.questionlenght.length) {
+    if (_questionNumber < widget.questionData.length) {
       _controller.nextPage(
         duration: const Duration(milliseconds: 600),
         curve: Curves.easeInOut,
@@ -65,7 +65,7 @@ class _QuizScreenState extends State<QuizScreen> {
         MaterialPageRoute(
           builder: (context) => ResultsScreen(
             score: score,
-            totalQuestions: widget.questionlenght.length,
+            totalQuestions: widget.questionData.length,
             whichTopic: widget.topicType,
           ),
         ),
@@ -91,6 +91,7 @@ class _QuizScreenState extends State<QuizScreen> {
   Widget build(BuildContext context) {
     const Color bgColor3 = Color(0xFF5170FD);
     const Color bgColor = Color(0xFF4993FA);
+
 
     return WillPopScope(
       onWillPop: () {
@@ -173,7 +174,7 @@ class _QuizScreenState extends State<QuizScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Question $_questionNumber/${widget.questionlenght.length}",
+                            "Question $_questionNumber/${widget.questionData.length}",
                             style: TextStyle(
                                 fontSize: 16, color: Colors.grey.shade500),
                           ),
@@ -181,7 +182,7 @@ class _QuizScreenState extends State<QuizScreen> {
                             child: PageView.builder(
                               controller: _controller,
                               physics: const NeverScrollableScrollPhysics(),
-                              itemCount: widget.questionlenght.length,
+                              itemCount: widget.questionData.length,
                               onPageChanged: (value) {
                                 setState(() {
                                   _questionNumber = value + 1;
@@ -190,14 +191,15 @@ class _QuizScreenState extends State<QuizScreen> {
                                 });
                               },
                               itemBuilder: (context, index) {
-                                final myquestions =
-                                    widget.questionlenght[index];
-                                var optionsIndex = widget.optionsList[index];
+                                final questionInstance = widget.questionData[index];
+                                var showingOptions = questionInstance.options;
+                                bool thisIsLocked = false;
+                                QuestionOptions? myOption;
 
                                 return Column(
                                   children: [
                                     Text(
-                                      myquestions.text,
+                                      questionInstance.question,
                                       style: Theme.of(context)
                                           .textTheme
                                           .bodyLarge!
@@ -208,91 +210,88 @@ class _QuizScreenState extends State<QuizScreen> {
                                     const SizedBox(
                                       height: 25,
                                     ),
-                                    Expanded(
-                                      child: ListView.builder(
-                                        itemCount: myquestions.options.length,
-                                        itemBuilder: (context, index) {
-                                          var color = Colors.grey.shade200;
+                                    StatefulBuilder(
+                                      builder: (context, setState) {
+                                        return Expanded(
+                                          child: ListView.builder(
+                                            itemCount: questionInstance.options.length,
+                                            itemBuilder: (context, index) {
+                                              var color = Colors.grey.shade200;
 
-                                          var questionOption =
-                                              myquestions.options[index];
-                                          final letters = optionsLetters[index];
+                                              final optionInstance = showingOptions[index];
+                                              final letters = optionsLetters[index];
 
-                                          if (myquestions.isLocked) {
-                                            if (questionOption ==
-                                                myquestions
-                                                    .selectedWiidgetOption) {
-                                              color = questionOption.isCorrect
-                                                  ? Colors.green
-                                                  : Colors.red;
-                                            } else if (questionOption
-                                                .isCorrect) {
-                                              color = Colors.green;
-                                            }
-                                          }
-                                          return InkWell(
-                                            onTap: () {
-                                              print(optionsIndex);
-                                              stopTime();
-                                              if (!myquestions.isLocked) {
-                                                setState(() {
-                                                  myquestions.isLocked = true;
-                                                  myquestions
-                                                          .selectedWiidgetOption =
-                                                      questionOption;
-                                                });
-
-                                                isLocked = myquestions.isLocked;
-                                                if (myquestions
-                                                    .selectedWiidgetOption
-                                                    .isCorrect) {
-                                                  score++;
+                                              if (thisIsLocked) {
+                                                if (myOption == questionInstance.options.firstWhere((element) => element.isCorrect)) {
+                                                  color = myOption?.isCorrect == true
+                                                      ? Colors.green
+                                                      : Colors.red;
+                                                } else if (myOption?.isCorrect == true) {
+                                                  color = Colors.green;
                                                 }
                                               }
-                                            },
-                                            child: Container(
-                                              height: 45,
-                                              padding: const EdgeInsets.all(10),
-                                              margin:
-                                                  const EdgeInsets.symmetric(
-                                                      vertical: 8),
-                                              decoration: BoxDecoration(
-                                                border:
-                                                    Border.all(color: color),
-                                                color: Colors.grey.shade100,
-                                                borderRadius:
-                                                    const BorderRadius.all(
-                                                        Radius.circular(10)),
-                                              ),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  Text(
-                                                    "$letters ${questionOption.text}",
-                                                    style: const TextStyle(
-                                                        fontSize: 16),
+                                              return InkWell(
+                                                onTap: () {
+                                                  print(myOption);
+                                                  stopTime();
+
+                                                  if (!thisIsLocked) {
+                                                    setState(() {
+                                                      thisIsLocked = true;
+                                                      myOption = showingOptions[index];
+                                                    });
+
+                                                    thisIsLocked = thisIsLocked;
+                                                    if (myOption?.isCorrect == true) {
+                                                      score++;
+                                                    }
+                                                  }
+                                                },
+                                                child: Container(
+                                                  height: 45,
+                                                  padding: const EdgeInsets.all(10),
+                                                  margin:
+                                                      const EdgeInsets.symmetric(
+                                                          vertical: 8),
+                                                  decoration: BoxDecoration(
+                                                    border:
+                                                        Border.all(color: color),
+                                                    color: Colors.grey.shade100,
+                                                    borderRadius:
+                                                        const BorderRadius.all(
+                                                            Radius.circular(10)),
                                                   ),
-                                                  isLocked == true
-                                                      ? questionOption.isCorrect
-                                                          ? const Icon(
-                                                              Icons
-                                                                  .check_circle,
-                                                              color:
-                                                                  Colors.green,
-                                                            )
-                                                          : const Icon(
-                                                              Icons.cancel,
-                                                              color: Colors.red,
-                                                            )
-                                                      : const SizedBox.shrink()
-                                                ],
-                                              ),
-                                            ),
-                                          );
-                                        },
-                                      ),
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      Text(
+                                                        "$letters ${optionInstance.text}",
+                                                        style: const TextStyle(
+                                                            fontSize: 16),
+                                                      ),
+                                                      thisIsLocked == true
+                                                          ? optionInstance.isCorrect
+                                                              ? const Icon(
+                                                                  Icons
+                                                                      .check_circle,
+                                                                  color:
+                                                                      Colors.green,
+                                                                )
+                                                              : const Icon(
+                                                                  Icons.cancel,
+                                                                  color: Colors.red,
+                                                                )
+                                                          : const SizedBox.shrink()
+                                                    ],
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                        );
+                                      }
                                     ),
                                   ],
                                 );
@@ -316,7 +315,7 @@ class _QuizScreenState extends State<QuizScreen> {
   }
 
   void _resetQuestionLocks() {
-    for (var question in widget.questionlenght) {
+    for (var question in widget.questionData) {
       question.isLocked = false;
     }
     questionTimerSeconds = 20;
@@ -335,7 +334,7 @@ class _QuizScreenState extends State<QuizScreen> {
         elevation: MaterialStateProperty.all(4),
       ),
       onPressed: () {
-        if (_questionNumber < widget.questionlenght.length) {
+        if (_questionNumber < widget.questionData.length) {
           _controller.nextPage(
             duration: const Duration(milliseconds: 800),
             curve: Curves.easeInOut,
@@ -353,7 +352,7 @@ class _QuizScreenState extends State<QuizScreen> {
             MaterialPageRoute(
               builder: (context) => ResultsScreen(
                 score: score,
-                totalQuestions: widget.questionlenght.length,
+                totalQuestions: widget.questionData.length,
                 whichTopic: widget.topicType,
               ),
             ),
@@ -361,7 +360,7 @@ class _QuizScreenState extends State<QuizScreen> {
         }
       },
       child: Text(
-        _questionNumber < widget.questionlenght.length
+        _questionNumber < widget.questionData.length
             ? 'Next Question'
             : 'Result',
         style: Theme.of(context).textTheme.bodySmall!.copyWith(

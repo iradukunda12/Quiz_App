@@ -174,6 +174,7 @@ class _SignupScreenState extends State<SignupScreen> {
         SupabaseConfig.client.auth.signOut();
         return true;
       }
+      isAdmin = initialSession?.user.email == adminEmail;
       Navigator.pushReplacement(
           context, MaterialPageRoute(builder: (context) => const HomePage()));
       return false;
