@@ -749,9 +749,9 @@
 
 import 'dart:async';
 
+import 'package:flashcards_quiz/views/results_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flashcards_quiz/views/results_screen.dart';
 
 import '../models/flutter_topics_model.dart';
 
@@ -1104,53 +1104,50 @@ class _QuizScreenState extends State<QuizScreen> {
   //     ),
   //   );
   ElevatedButton buildElevatedButton() {
-  const Color cardColor = Color(0xFF4993FA);
+    const Color cardColor = Color(0xFF4993FA);
 
-  return ElevatedButton(
-    style: ButtonStyle(
-      backgroundColor: MaterialStateProperty.all(cardColor),
-      fixedSize: MaterialStateProperty.all(
-        Size(MediaQuery.of(context).size.width * 0.80, 40),
+    return ElevatedButton(
+      style: ButtonStyle(
+        backgroundColor: MaterialStateProperty.all(cardColor),
+        fixedSize: MaterialStateProperty.all(
+          Size(MediaQuery.of(context).size.width * 0.80, 40),
+        ),
+        elevation: MaterialStateProperty.all(4),
       ),
-      elevation: MaterialStateProperty.all(4),
-    ),
-    onPressed: () {
-      if (_questionNumber < widget.questions.length) {
-        _controller.nextPage(
-          duration: const Duration(milliseconds: 800),
-          curve: Curves.easeInOut,
-        );
-        setState(() {
-          _questionNumber++;
-          isLocked = false;
-        });
-        _resetQuestionLocks();
-        startTimerOnQuestions();
-      } else {
-        _timer?.cancel();
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ResultsScreen(
-              score: score,
-              totalQuestions: widget.questions.length,
-              whichTopic: widget.topicType,
+      onPressed: () {
+        if (_questionNumber < widget.questions.length) {
+          _controller.nextPage(
+            duration: const Duration(milliseconds: 800),
+            curve: Curves.easeInOut,
+          );
+          setState(() {
+            _questionNumber++;
+            isLocked = false;
+          });
+          _resetQuestionLocks();
+          startTimerOnQuestions();
+        } else {
+          _timer?.cancel();
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ResultsScreen(
+                score: score,
+                totalQuestions: widget.questions.length,
+                whichTopic: widget.topicType,
+              ),
             ),
-          ),
-        );
-      }
-    },
-    child: Text(
-      _questionNumber < widget.questions.length
-          ? 'Next Question'
-          : 'Result',
-      style: Theme.of(context).textTheme.bodyText2!.copyWith(
-            color: Colors.white,
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-          ),
-    ),
-  );
-
+          );
+        }
+      },
+      child: Text(
+        _questionNumber < widget.questions.length ? 'Next Question' : 'Result',
+        style: Theme.of(context).textTheme.bodyText2!.copyWith(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+            ),
+      ),
+    );
   }
 }

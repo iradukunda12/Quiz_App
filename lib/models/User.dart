@@ -5,6 +5,7 @@ class User {
   final String email;
   final String token;
   final String password;
+
   User({
     required this.studentId,
     required this.email,

@@ -157,10 +157,36 @@ import 'package:widget_state_notifier/widget_state_notifier.dart';
 import '../models/flutter_topics_model.dart';
 import '../notifiers/QuestionNotifier.dart';
 
-class WidgetView extends StatelessWidget {
+class WidgetView extends StatefulWidget {
   final String category;
   final QuestionNotifier questionNotifier;
-  WidgetView(this.category, this.questionNotifier);
+
+  const WidgetView(this.category, this.questionNotifier, {super.key});
+
+  @override
+  State<WidgetView> createState() => _WidgetViewState();
+}
+
+class _WidgetViewState extends State<WidgetView> implements QuestionImplement {
+  @override
+  BuildContext? get getContext => context;
+
+  @override
+  int? get getHasCode => hashCode;
+
+  @override
+  void initState() {
+    super.initState();
+
+    widget.questionNotifier.attach(this);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    widget.questionNotifier.detach(this);
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -171,7 +197,7 @@ class WidgetView extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => RegisterQuestion(category),
+                    builder: (context) => RegisterQuestion(widget.category),
                   ),
                 );
               },
@@ -181,7 +207,7 @@ class WidgetView extends StatelessWidget {
             appBar: AppBar(
               backgroundColor: bgColor3,
               title: Text(
-                '${category} Questions',
+                '${widget.category} Questions',
                 style: TextStyle(color: Colors.white),
               ),
               leading: IconButton(
@@ -198,10 +224,11 @@ class WidgetView extends StatelessWidget {
               child: Column(
                 children: [
                   WidgetStateConsumer(
-                      widgetStateNotifier: questionNotifier.stateNotifier,
+                      widgetStateNotifier:
+                          widget.questionNotifier.stateNotifier,
                       widgetStateBuilder: (context, snapshot) {
-                        List<QuestionData> questions =
-                            snapshot ?? questionNotifier.getLatestQuestions();
+                        List<QuestionData> questions = snapshot ??
+                            widget.questionNotifier.getLatestQuestions();
                         return ListView.builder(
                           physics: NeverScrollableScrollPhysics(),
                           shrinkWrap: true,
@@ -246,7 +273,7 @@ class WidgetView extends StatelessWidget {
                                             MaterialPageRoute(
                                               builder: (context) =>
                                                   RegisterQuestion(
-                                                category,
+                                                widget.category,
                                                 layOutQuestion: question,
                                               ),
                                             ),

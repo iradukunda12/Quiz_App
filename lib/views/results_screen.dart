@@ -7,6 +7,7 @@ class ResultsScreen extends StatelessWidget {
       required this.score,
       required this.totalQuestions,
       required this.whichTopic});
+
   final int score;
   final int totalQuestions;
   final String whichTopic;

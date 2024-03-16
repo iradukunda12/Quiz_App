@@ -1,10 +1,9 @@
 import 'dart:io';
 
-import 'package:flashcards_quiz/views/home_screen.dart';
+import 'package:flashcards_quiz/notifiers/TitleNotifier.dart';
 import 'package:flashcards_quiz/views/signup_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
-import 'package:hive/hive.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive_flutter/adapters.dart';
@@ -12,6 +11,9 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 bool isAdmin = false;
 String adminEmail = 'admin@gmail.com';
+const userBoxName = 'userBox';
+const Color bgColor = Color(0xFF4993FA);
+const Color bgColor3 = Color(0xFF5170FD);
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,7 +28,8 @@ void main() async {
   await SupabaseConfig.initialize;
   await HiveConfig().startHive();
 
-  await HiveConfig().interface().openBox("userBox");
+  await HiveConfig().interface().openBox(userBoxName);
+  await HiveConfig().interface().openBox(TitleNotifier().questionBoxName);
 
   runApp(MyApp());
 }
@@ -69,10 +72,6 @@ class HiveConfig {
     return interface().box(boxName);
   }
 }
-
-const userBoxName = 'userBox';
-const Color bgColor = Color(0xFF4993FA);
-const Color bgColor3 = Color(0xFF5170FD);
 
 BuildContext showCustomProgressBar(BuildContext context,
     {var cancelTouch = false}) {

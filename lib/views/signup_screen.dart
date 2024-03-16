@@ -9,7 +9,6 @@ import 'package:widget_state_notifier/widget_state_notifier.dart';
 
 import '../custom_textfield.dart';
 import '../main.dart';
-import '../services/auth_services.dart';
 import 'home_screen.dart';
 import 'login_screen.dart';
 // Import the file where CustomTextField is defined
@@ -25,6 +24,7 @@ class _SignupScreenState extends State<SignupScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController studentIdController = TextEditingController();
+
   // final AuthService authService = AuthService();
 
   WidgetStateNotifier<bool> sessionNotifier =

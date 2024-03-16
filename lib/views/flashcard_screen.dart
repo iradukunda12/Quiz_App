@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:appinio_swiper/appinio_swiper.dart';
 import 'package:flashcards_quiz/notifiers/QuestionNotifier.dart';
 import 'package:flashcards_quiz/views/quiz_screen.dart';
@@ -6,13 +8,13 @@ import 'package:flashcards_quiz/widgets/linear_progress_indicator_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:widget_state_notifier/widget_state_notifier.dart';
-import 'dart:math';
 
 import '../models/flutter_topics_model.dart';
 
 class NewCard extends StatefulWidget {
   final String topicName;
   final QuestionNotifier questionNotifier;
+
   const NewCard({
     super.key,
     required this.topicName,
@@ -24,8 +26,27 @@ class NewCard extends StatefulWidget {
   State<NewCard> createState() => _NewCardState();
 }
 
-class _NewCardState extends State<NewCard> {
+class _NewCardState extends State<NewCard> implements QuestionImplement {
   final AppinioSwiperController controller = AppinioSwiperController();
+
+  @override
+  BuildContext? get getContext => context;
+
+  @override
+  int? get getHasCode => hashCode;
+
+  @override
+  void initState() {
+    super.initState();
+
+    widget.questionNotifier.attach(this);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    widget.questionNotifier.detach(this);
+  }
 
   @override
   Widget build(BuildContext context) {

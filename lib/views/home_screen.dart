@@ -7,7 +7,6 @@ import 'package:flashcards_quiz/views/signup_screen.dart';
 import 'package:flashcards_quiz/views/widgetview.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:quickalert/quickalert.dart';
 import 'package:widget_state_notifier/widget_state_notifier.dart';
 
@@ -123,7 +122,7 @@ class _HomePageState extends State<HomePage> implements TitleImplement {
                   height: 10,
                 ),
                 WidgetStateConsumer(
-                    widgetStateNotifier: TitleNotifier().stateNotifier,
+                    widgetStateNotifier: TitleNotifier().titleNotifier,
                     widgetStateBuilder: (context, snapshot) {
                       if (snapshot == null) {
                         return SizedBox(

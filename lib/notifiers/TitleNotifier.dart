@@ -3,6 +3,7 @@ import 'package:flashcards_quiz/models/flutter_topics_model.dart';
 import 'package:flashcards_quiz/notifiers/QuestionNotifier.dart';
 import 'package:flashcards_quiz/operation/QuestionOperation.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:hive_flutter/adapters.dart';
 import 'package:widget_state_notifier/widget_state_notifier.dart';
 
 class TitleImplement {
@@ -16,43 +17,172 @@ class TitleNotifier {
 
   TitleNotifier.internal();
 
-  WidgetStateNotifier<List<String>> stateNotifier = WidgetStateNotifier();
+  String questionBoxName = "question_database";
+  WidgetStateNotifier<List<String>> titleNotifier = WidgetStateNotifier();
+  WidgetStateNotifier<List<QuestionData>> questionsNotifier =
+      WidgetStateNotifier();
   List<String> titles = [];
   Map<String, QuestionNotifier> questionNotifiers = {};
   TitleImplement? _titleImplement;
 
   bool started = false;
-  TitleNotifier start(TitleImplement titleImplement) {
+
+  Future<TitleNotifier> start(TitleImplement titleImplement) async {
     BuildContext? buildContext = titleImplement.getContext;
     if (buildContext != null) {
       _titleImplement = titleImplement;
       started = true;
-      _startFetching();
+      _startFetchingOffline();
+      _startFetchingOnline();
     }
     return this;
   }
 
-  void _startFetching() {
-    QuestionOperation().getAllQuestions().then((value) {
-      List<String> getTitles = [];
+  void _startFetchingOffline() {
+    Box questionBox = HiveConfig().getBox(questionBoxName);
 
-      for (var element in value) {
-        String title = element['questions_identity'];
-        if (!getTitles.contains(title)) {
+    void latestOfflineProcessor() {
+      List<QuestionData> allQuestions = getOfflineQuestions();
+      if (allQuestions.isNotEmpty) {
+        // Send Latest Questions to Question Notifiers
+        extractTitles(allQuestions, false);
+        questionsNotifier.sendNewState(allQuestions);
+      }
+    }
+
+    latestOfflineProcessor();
+
+    questionBox.listenable().addListener(() {
+      latestOfflineProcessor();
+    });
+  }
+
+  List<QuestionData> getOfflineQuestions() {
+    Box questionBox = HiveConfig().getBox(questionBoxName);
+
+    final keys = questionBox.keys;
+
+    final questionData = keys.map((e) => questionBox.get(e)).toList();
+
+    if (questionData.isNotEmpty && questionData.firstOrNull is Map) {
+      List<QuestionData> allQuestions =
+          questionData.map((e) => QuestionData.fromJson(e)).toList();
+      return allQuestions;
+    }
+    return [];
+  }
+
+  void _startFetchingOnline() {
+    QuestionOperation().getAllQuestions().then((questions) {
+      List<QuestionData> allQuestions = questions
+          .map((e) => QuestionData.fromOnline(e['questions_data'],
+              e['questions_id'].toString(), e['questions_identity']))
+          .toList();
+
+      extractTitles(allQuestions, true);
+    });
+  }
+
+  void extractTitles(List<QuestionData> allQuestions, bool online) {
+    List<String> getTitles = [];
+    bool firstTime = titles.isEmpty;
+
+    if (firstTime || !online) {
+      for (var element in allQuestions) {
+        String title = element.questionTitle ?? '';
+
+        if (!titles.contains(title) && title.isNotEmpty) {
+          getTitles.add(title);
+          _processGroups(
+              title,
+              allQuestions
+                  .where((element) => element.questionTitle == title)
+                  .toList());
+        } else if (title.isNotEmpty) {
           getTitles.add(title);
         }
       }
 
-      for (var theTitle in getTitles) {
-        List<QuestionData> allQuestions = value
-            .where((dataValue) => dataValue['questions_identity'] == theTitle)
-            .map((e) => QuestionData.fromJson(e['questions_data']))
-            .toList();
-        _processGroups(theTitle, allQuestions);
+      if (!firstTime && !online) {
+        for (var element in titles) {
+          if (!getTitles.contains(element)) {
+            removeQuestionNotifier(element);
+          }
+        }
       }
-
       _sendUpdate();
-    });
+    }
+
+    if (online && firstTime) {
+      saveFirstTimeLatestQuestions(allQuestions);
+    } else if (online && !firstTime) {
+      startSyncing(allQuestions);
+    }
+  }
+
+  void startSyncing(List<QuestionData> onlineQuestions) {
+    List<QuestionData> offlineQuestion = getOfflineQuestions();
+
+    List<String> offlineQuestionId =
+        offlineQuestion.map((e) => e.questionId ?? '').toList();
+    List<String> onlineQuestionId =
+        onlineQuestions.map((e) => e.questionId ?? '').toList();
+
+    offlineQuestionId.removeWhere((element) => element.isEmpty);
+    onlineQuestionId.removeWhere((element) => element.isEmpty);
+
+    //  Remove online question removed from device
+    List<String> removedOnlineQuestions = onlineQuestionId
+        .where((onlineId) => !offlineQuestionId.contains(onlineId))
+        .toList();
+    _removeOnlineQuestions(removedOnlineQuestions);
+
+    //   Add new Question from device to online
+
+    List<QuestionData> newOnlineQuestionsFromOffline = offlineQuestion
+        .where(
+            (offlineData) => !onlineQuestionId.contains(offlineData.questionId))
+        .toList();
+    saveOfflineQuestion(newOnlineQuestionsFromOffline);
+
+    //   Update the old questions offline to online
+    updateTheOnlineQuestions(offlineQuestion);
+  }
+
+  void _removeOnlineQuestions(List<String> removedOnlineQuestions) {
+    for (var element in removedOnlineQuestions) {
+      QuestionOperation().removeThisQuestion(element).then((value) {});
+    }
+  }
+
+  void saveOfflineQuestion(List<QuestionData> newOnlineQuestionsFromOffline) {
+    for (var element in newOnlineQuestionsFromOffline) {
+      if (element.questionTitle != null) {
+        QuestionOperation()
+            .saveQuestion(element.questionTitle!, element)
+            .then((value) => null);
+      }
+    }
+  }
+
+  void updateTheOnlineQuestions(List<QuestionData> offlineQuestion) {
+    for (var element in offlineQuestion) {
+      if (element.questionId != null) {
+        QuestionOperation()
+            .updateQuestion(element.questionId!, element)
+            .then((value) => null);
+      }
+    }
+  }
+
+  void saveFirstTimeLatestQuestions(List<QuestionData> allQuestions) {
+    Box questionBox = HiveConfig().getBox(questionBoxName);
+
+    questionBox.clear();
+
+    for (var question in allQuestions) {
+      questionBox.put(question.questionId, question.toJson());
+    }
   }
 
   QuestionNotifier? getThisQuestionNotifier(String title,
@@ -60,7 +190,8 @@ class TitleNotifier {
     if (questionNotifiers.keys.toList().contains(title)) {
       return questionNotifiers[title];
     } else {
-      QuestionNotifier questionNotifier = QuestionNotifier(title, question);
+      QuestionNotifier questionNotifier =
+          QuestionNotifier(title, questionsNotifier);
       questionNotifiers[title] = questionNotifier;
       return questionNotifiers[title];
     }
@@ -99,7 +230,7 @@ class TitleNotifier {
 
   void _sendUpdate() {
     if (titles.isNotEmpty) {
-      stateNotifier.sendNewState(titles);
+      titleNotifier.sendNewState(titles);
     }
   }
 }

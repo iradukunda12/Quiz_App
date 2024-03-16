@@ -5,12 +5,10 @@ import 'package:flashcards_quiz/views/home_screen.dart';
 import 'package:flashcards_quiz/views/signup_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:widget_state_notifier/widget_state_notifier.dart';
 
 import '../custom_textfield.dart';
 import '../main.dart';
-import '../services/auth_services.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -27,6 +25,7 @@ class _LoginScreenState extends State<LoginScreen> {
       WidgetStateNotifier(currentValue: false);
   WidgetStateNotifier<bool> passwordNotifier =
       WidgetStateNotifier(currentValue: false);
+
   // final AuthService authService = AuthService();
 
   // void loginUser() {

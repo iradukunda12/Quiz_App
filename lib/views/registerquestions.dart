@@ -1,36 +1,19 @@
 import 'package:flashcards_quiz/utils/utils.dart';
-import 'package:flashcards_quiz/views/home_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../models/flutter_topics_model.dart';
 
-class RegisterQuestion extends StatelessWidget {
+class RegisterQuestion extends StatefulWidget {
   final String category;
   final QuestionData? layOutQuestion;
+
   RegisterQuestion(this.category, {this.layOutQuestion});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Quiz Form',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      home: QuizForm(layOutQuestion),
-    );
-  }
+  State<RegisterQuestion> createState() => _RegisterQuestionState();
 }
 
-class QuizForm extends StatefulWidget {
-  final QuestionData? layOutQuestion;
-  QuizForm(this.layOutQuestion);
-  @override
-  _QuizFormState createState() => _QuizFormState();
-}
-
-class _QuizFormState extends State<QuizForm> {
+class _RegisterQuestionState extends State<RegisterQuestion> {
   late TextEditingController _questionController;
   late List<TextEditingController> _optionControllers;
   List<bool> _correctAnswers = [false, false, false, false];
@@ -77,7 +60,11 @@ class _QuizFormState extends State<QuizForm> {
         text: _optionControllers[3].text.trim(), isCorrect: _correctAnswers[3]);
 
     QuestionData layOutQuestion = QuestionData(
-        question: question, options: [option1, option2, option3, option4]);
+      question: question,
+      options: [option1, option2, option3, option4],
+      questionId: null,
+      questionTitle: widget.category,
+    );
   }
 
   @override
