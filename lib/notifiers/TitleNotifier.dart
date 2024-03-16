@@ -38,6 +38,12 @@ class TitleNotifier {
     return this;
   }
 
+  void restart() {
+    if(started){
+      _startFetchingOnline();
+    }
+  }
+
   void _startFetchingOffline() {
     Box questionBox = HiveConfig().getBox(questionBoxName);
 
@@ -237,4 +243,6 @@ class TitleNotifier {
       titleNotifier.sendNewState(titles);
     }
   }
+
+
 }

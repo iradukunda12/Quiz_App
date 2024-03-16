@@ -91,6 +91,7 @@ class _RegisterQuestionState extends State<RegisterQuestion> {
 
       //   New
       questionBox.put(questionId, questionData.toJson()).then((value) {
+        TitleNotifier().restart();
         Navigator.pop(context);
       });
     }
