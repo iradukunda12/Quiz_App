@@ -1,7 +1,10 @@
+import 'dart:math';
+
 import 'package:flashcards_quiz/main.dart';
 import 'package:flashcards_quiz/models/flutter_topics_model.dart';
 import 'package:postgrest/src/postgrest_builder.dart';
 import 'package:postgrest/src/types.dart';
+import 'package:uuid/uuid.dart';
 
 class QuestionOperation {
   String questionTableName = "questions_table";
@@ -10,10 +13,12 @@ class QuestionOperation {
   String questionIdName = "questions_id";
 
   PostgrestFilterBuilder saveQuestion(
-      String questionIdentity, QuestionData questionData) {
+      String questionId, String questionIdentity, QuestionData questionData,
+      {String? offlineIdentity}) {
     return SupabaseConfig.client.from(questionTableName).insert({
       questionIdentityName: questionIdentity,
       questionDataName: questionData.toJson(),
+      questionIdName: questionId,
     });
   }
 
@@ -33,5 +38,10 @@ class QuestionOperation {
         .from(questionTableName)
         .delete()
         .eq(questionIdName, questionId);
+  }
+
+  String generateUUID() {
+    const uuid = Uuid();
+    return uuid.v4(); // Generates a version 4 UUID
   }
 }

@@ -68,6 +68,7 @@ class QuestionData {
   QuestionData copyWith({
     String? questionId,
     String? questionTitle,
+    String? questionOfflineIdentity,
     String? question,
     List<QuestionOptions>? options,
     bool? isLocked,

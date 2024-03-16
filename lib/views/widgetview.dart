@@ -151,11 +151,14 @@
 
 import 'package:flashcards_quiz/main.dart';
 import 'package:flashcards_quiz/views/registerquestions.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:widget_state_notifier/widget_state_notifier.dart';
 
 import '../models/flutter_topics_model.dart';
 import '../notifiers/QuestionNotifier.dart';
+import '../notifiers/TitleNotifier.dart';
 
 class WidgetView extends StatefulWidget {
   final String category;
@@ -184,6 +187,9 @@ class _WidgetViewState extends State<WidgetView> implements QuestionImplement {
   @override
   void dispose() {
     super.dispose();
+    if (widget.questionNotifier.getLatestQuestions().isEmpty) {
+      TitleNotifier().removeQuestionNotifier(widget.category);
+    }
     widget.questionNotifier.detach(this);
   }
 
@@ -284,9 +290,21 @@ class _WidgetViewState extends State<WidgetView> implements QuestionImplement {
                                       SizedBox(
                                         width: 10,
                                       ),
-                                      Icon(
-                                        Icons.delete,
-                                        color: Colors.red,
+                                      GestureDetector(
+                                        onTap: () {
+                                          Box questionBox = HiveConfig().getBox(
+                                              TitleNotifier().questionBoxName);
+
+                                          if (question.questionId != null) {
+                                            questionBox
+                                                .delete(question.questionId)
+                                                .then((value) => null);
+                                          }
+                                        },
+                                        child: Icon(
+                                          Icons.delete,
+                                          color: Colors.red,
+                                        ),
                                       ),
                                     ],
                                   ),

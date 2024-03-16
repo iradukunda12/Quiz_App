@@ -1,5 +1,9 @@
+import 'package:flashcards_quiz/main.dart';
+import 'package:flashcards_quiz/notifiers/TitleNotifier.dart';
+import 'package:flashcards_quiz/operation/QuestionOperation.dart';
 import 'package:flashcards_quiz/utils/utils.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 
 import '../models/flutter_topics_model.dart';
 
@@ -59,12 +63,37 @@ class _RegisterQuestionState extends State<RegisterQuestion> {
     QuestionOptions option4 = QuestionOptions(
         text: _optionControllers[3].text.trim(), isCorrect: _correctAnswers[3]);
 
-    QuestionData layOutQuestion = QuestionData(
-      question: question,
-      options: [option1, option2, option3, option4],
-      questionId: null,
-      questionTitle: widget.category,
-    );
+    Box questionBox = HiveConfig().getBox(TitleNotifier().questionBoxName);
+
+    if (widget.layOutQuestion?.questionId != null) {
+      QuestionData questionData = QuestionData(
+        question: question,
+        options: [option1, option2, option3, option4],
+        questionId: widget.layOutQuestion?.questionId,
+        questionTitle: widget.category,
+      );
+
+      //   Edit
+      questionBox.delete(widget.layOutQuestion?.questionId).then((value) {
+        questionBox.put(
+            widget.layOutQuestion?.questionId, questionData.toJson());
+        Navigator.pop(context);
+      });
+    } else {
+      String questionId = QuestionOperation().generateUUID();
+
+      QuestionData questionData = QuestionData(
+        question: question,
+        options: [option1, option2, option3, option4],
+        questionId: questionId,
+        questionTitle: widget.category,
+      );
+
+      //   New
+      questionBox.put(questionId, questionData.toJson()).then((value) {
+        Navigator.pop(context);
+      });
+    }
   }
 
   @override
@@ -117,6 +146,7 @@ class _RegisterQuestionState extends State<RegisterQuestion> {
                     value: _correctAnswers[index],
                     onChanged: (value) {
                       setState(() {
+                        _correctAnswers = List.generate(4, (index) => false);
                         _correctAnswers[index] = value;
                       });
                     },

@@ -45,8 +45,8 @@ class TitleNotifier {
       List<QuestionData> allQuestions = getOfflineQuestions();
       if (allQuestions.isNotEmpty) {
         // Send Latest Questions to Question Notifiers
-        extractTitles(allQuestions, false);
         questionsNotifier.sendNewState(allQuestions);
+        extractTitles(allQuestions, false);
       }
     }
 
@@ -104,7 +104,9 @@ class TitleNotifier {
       }
 
       if (!firstTime && !online) {
-        for (var element in titles) {
+        List<String> presentTitle = [];
+        presentTitle.addAll(titles);
+        for (var element in presentTitle) {
           if (!getTitles.contains(element)) {
             removeQuestionNotifier(element);
           }
@@ -115,7 +117,7 @@ class TitleNotifier {
 
     if (online && firstTime) {
       saveFirstTimeLatestQuestions(allQuestions);
-    } else if (online && !firstTime) {
+    } else if (online && !firstTime || !online) {
       startSyncing(allQuestions);
     }
   }
@@ -159,7 +161,9 @@ class TitleNotifier {
     for (var element in newOnlineQuestionsFromOffline) {
       if (element.questionTitle != null) {
         QuestionOperation()
-            .saveQuestion(element.questionTitle!, element)
+            .saveQuestion(QuestionOperation().generateUUID(),
+                element.questionTitle!, element,
+                offlineIdentity: element.questionId)
             .then((value) => null);
       }
     }

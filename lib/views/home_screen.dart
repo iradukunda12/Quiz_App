@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flashcards_quiz/main.dart';
 import 'package:flashcards_quiz/notifiers/TitleNotifier.dart';
 import 'package:flashcards_quiz/views/flashcard_screen.dart';
+import 'package:flashcards_quiz/views/login_screen.dart';
 import 'package:flashcards_quiz/views/signup_screen.dart';
 import 'package:flashcards_quiz/views/widgetview.dart';
 import 'package:flutter/cupertino.dart';
@@ -54,7 +55,7 @@ class _HomePageState extends State<HomePage> implements TitleImplement {
                             Navigator.pushAndRemoveUntil(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => const SignupScreen()),
+                                    builder: (context) => const LoginScreen()),
                                 (route) => false);
                           });
                         },

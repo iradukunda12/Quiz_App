@@ -18,7 +18,7 @@ class CategoryView extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: bgColor,
         title: const Text(
-          'Choose The Category',
+          'Create New Category',
           style: TextStyle(color: Colors.white),
         ),
         leading: IconButton(
@@ -49,7 +49,7 @@ class CategoryView extends StatelessWidget {
                 child: TextField(
                   controller: _categoryController,
                   decoration: const InputDecoration(
-                    hintText: 'Enter your question',
+                    hintText: 'Enter Category',
                   ),
                 ),
               ),
@@ -60,7 +60,7 @@ class CategoryView extends StatelessWidget {
                     QuestionNotifier? questionNotifier = TitleNotifier()
                         .getThisQuestionNotifier(_categoryController.text);
                     if (questionNotifier != null) {
-                      Navigator.push(
+                      Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
                           builder: (context) => WidgetView(
@@ -81,7 +81,7 @@ class CategoryView extends StatelessWidget {
                   ),
                 ),
                 child: const Text(
-                  'Proceed to Question',
+                  'Proceed to add Question',
                   style: TextStyle(color: Colors.white),
                 ),
               ),
