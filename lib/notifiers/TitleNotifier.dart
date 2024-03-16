@@ -126,7 +126,7 @@ class TitleNotifier {
 
     if (online && firstTime) {
       saveFirstTimeLatestQuestions(allQuestions);
-    } else if (online && !firstTime && isAdmin || !online && isAdmin) {
+    } else if (online && !firstTime && isAdmin) {
       startSyncing(allQuestions);
     }
   }
