@@ -26,6 +26,7 @@ class TitleNotifier {
   TitleImplement? _titleImplement;
 
   bool started = false;
+  bool _savingFirst = false;
 
   Future<TitleNotifier> start(TitleImplement titleImplement) async {
     BuildContext? buildContext = titleImplement.getContext;
@@ -56,10 +57,12 @@ class TitleNotifier {
       }
     }
 
-    latestOfflineProcessor();
+    // latestOfflineProcessor();
 
     questionBox.listenable().addListener(() {
-      latestOfflineProcessor();
+      if(!_savingFirst) {
+        latestOfflineProcessor();
+      }
     });
   }
 
@@ -121,7 +124,7 @@ class TitleNotifier {
       _sendUpdate();
     }
 
-    if (online && firstTime && isAdmin || !isAdmin) {
+    if (online && firstTime) {
       saveFirstTimeLatestQuestions(allQuestions);
     } else if (online && !firstTime && isAdmin || !online && isAdmin) {
       startSyncing(allQuestions);
@@ -190,9 +193,11 @@ class TitleNotifier {
 
     questionBox.clear();
 
+    _savingFirst = true;
     for (var question in allQuestions) {
       questionBox.put(question.questionId, question.toJson());
     }
+    _savingFirst = false;
   }
 
   QuestionNotifier? getThisQuestionNotifier(String title,
