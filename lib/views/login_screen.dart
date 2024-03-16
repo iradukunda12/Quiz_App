@@ -20,12 +20,13 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
-  WidgetStateNotifier<bool> emailNotifier = WidgetStateNotifier(currentValue: false);
-  WidgetStateNotifier<bool> passwordNotifier = WidgetStateNotifier(currentValue: false);
+  WidgetStateNotifier<bool> emailNotifier =
+      WidgetStateNotifier(currentValue: false);
+  WidgetStateNotifier<bool> passwordNotifier =
+      WidgetStateNotifier(currentValue: false);
   // final AuthService authService = AuthService();
 
   // void loginUser() {
@@ -47,15 +48,12 @@ class _LoginScreenState extends State<LoginScreen> {
     passwordNotifier.addController(passwordController, (stateNotifier) {
       stateNotifier.sendNewState(passwordController.text.isNotEmpty);
     });
-
   }
-
 
   void onUnsuccessful(Object error) {
     closeCustomProgressBar(context);
     if (error.runtimeType == AuthException) {
-      String errorMessage =
-      (error as AuthException).message.toLowerCase();
+      String errorMessage = (error as AuthException).message.toLowerCase();
 
       switch (errorMessage) {
         case "email not confirmed":
@@ -93,7 +91,7 @@ class _LoginScreenState extends State<LoginScreen> {
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (context) => const HomePage()),
-          (Route<dynamic> route) => false,
+      (Route<dynamic> route) => false,
     );
   }
 
@@ -119,22 +117,20 @@ class _LoginScreenState extends State<LoginScreen> {
         // Retrieve the uuid
         // Check if there is a value
         if (uuid != null) {
-                // Save the user data to storage
-          UserDB().saveOnlineUserRecordToLocal(userData, useOther: true)
-                    .then((saved) {
-                  //  Check if saving operation was success
-                  if (saved) {
-                        closeCustomProgressBar(context);
-                        isAdmin = adminEmail == email;
-                        goToSecondaryPage();
-
-                  } else {
-                    // Unable to save data
-                    onSignInError(3);
-                  }
-                }).onError((error, stackTrace) => onSignInError(4));
-
-
+          // Save the user data to storage
+          UserDB()
+              .saveOnlineUserRecordToLocal(userData, useOther: true)
+              .then((saved) {
+            //  Check if saving operation was success
+            if (saved) {
+              closeCustomProgressBar(context);
+              isAdmin = adminEmail == email;
+              goToSecondaryPage();
+            } else {
+              // Unable to save data
+              onSignInError(3);
+            }
+          }).onError((error, stackTrace) => onSignInError(4));
         } else {
           // Retrieving uuid failed
           onSignInError(9);
@@ -154,11 +150,10 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<Null>? onSignInError(int n) async {
     closeCustomProgressBar(context);
     showSnackBar(context, "Unable to Sign in at the moment. Code $n");
-    SupabaseConfig.client.auth.signOut().then((value){
+    SupabaseConfig.client.auth.signOut().then((value) {
       Navigator.pop(context);
     });
   }
-
 
   Stream<AuthResponse> loginUser() {
     String email = emailController.text.trim();
@@ -177,15 +172,14 @@ class _LoginScreenState extends State<LoginScreen> {
     if (isEmail) {
       String email = emailController.text.trim();
       String password = passwordController.text.trim();
-      loginUser().listen(
-              (event) {
-            closeCustomProgressBar(context);
-            if (event.user != null) {
-              onSignInComplete(event);
-            } else {
-              showSnackBar(context, "Try again!!!");
-            }
-          }, onError: onUnsuccessful);
+      loginUser().listen((event) {
+        closeCustomProgressBar(context);
+        if (event.user != null) {
+          onSignInComplete(event);
+        } else {
+          showSnackBar(context, "Try again!!!");
+        }
+      }, onError: onUnsuccessful);
     } else {
       showSnackBar(context, "Check your email address or username.");
       closeCustomProgressBar(context);
@@ -220,33 +214,32 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
           const SizedBox(height: 40),
           MultiWidgetStateConsumer(
-            widgetStateListNotifiers: [emailNotifier,passwordNotifier],
-            widgetStateListBuilder: (context) {
-              return ElevatedButton(
-                onPressed: (){
-                  if(emailNotifier.currentValue == true && passwordNotifier.currentValue == true){
-                    signInUsers();
-                  }else{
-                    showSnackBar(context, "Enter values for all fields");
-                  }
-                },
-                style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(Colors.blue),
-                  textStyle: MaterialStateProperty.all(
-                    const TextStyle(color: Colors.white),
+              widgetStateListNotifiers: [emailNotifier, passwordNotifier],
+              widgetStateListBuilder: (context) {
+                return ElevatedButton(
+                  onPressed: () {
+                    if (emailNotifier.currentValue == true &&
+                        passwordNotifier.currentValue == true) {
+                      signInUsers();
+                    } else {
+                      showSnackBar(context, "Enter values for all fields");
+                    }
+                  },
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all(Colors.blue),
+                    textStyle: MaterialStateProperty.all(
+                      const TextStyle(color: Colors.white),
+                    ),
+                    minimumSize: MaterialStateProperty.all(
+                      Size(MediaQuery.of(context).size.width / 2.5, 50),
+                    ),
                   ),
-                  minimumSize: MaterialStateProperty.all(
-                    Size(MediaQuery.of(context).size.width / 2.5, 50),
+                  child: const Text(
+                    "Login",
+                    style: TextStyle(color: Colors.white, fontSize: 16),
                   ),
-                ),
-                child: const Text(
-                  "Login",
-                  style: TextStyle(color: Colors.white, fontSize: 16),
-                ),
-              );
-            }
-          ),
-
+                );
+              }),
           SizedBox(height: MediaQuery.of(context).size.height * 0.1),
           TextButton(
             onPressed: () {

@@ -3,10 +3,9 @@ import 'package:flashcards_quiz/views/home_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../models/flutter_topics_model.dart';
-import '../models/layout_questions_model.dart';
 
 class RegisterQuestion extends StatelessWidget {
-  final String  category;
+  final String category;
   final QuestionData? layOutQuestion;
   RegisterQuestion(this.category, {this.layOutQuestion});
 
@@ -36,46 +35,51 @@ class _QuizFormState extends State<QuizForm> {
   late List<TextEditingController> _optionControllers;
   List<bool> _correctAnswers = [false, false, false, false];
 
- @override
+  @override
   void initState() {
     super.initState();
 
     _optionControllers = [];
-    _questionController = TextEditingController(text: widget.layOutQuestion?.question ?? '');
-    if(widget.layOutQuestion?.options.length != null) {
+    _questionController =
+        TextEditingController(text: widget.layOutQuestion?.question ?? '');
+    if (widget.layOutQuestion?.options.length != null) {
       for (var i = 0; i < (widget.layOutQuestion?.options.length ?? 0); i++) {
         _optionControllers.add(
           TextEditingController(
               text: widget.layOutQuestion?.options[i].text ?? ''),
         );
-        _correctAnswers[i] = widget.layOutQuestion?.options[i].isCorrect ?? false;
+        _correctAnswers[i] =
+            widget.layOutQuestion?.options[i].isCorrect ?? false;
       }
-    }else{
+    } else {
       _optionControllers = List.generate(
         4,
-            (index) => TextEditingController(),
+        (index) => TextEditingController(),
       );
-
     }
   }
 
-  bool canSubmit (){
-   return _questionController.text.isNotEmpty && _optionControllers.where((element) => element.text.isEmpty).isEmpty && _correctAnswers.where((element) => element).isNotEmpty;
+  bool canSubmit() {
+    return _questionController.text.isNotEmpty &&
+        _optionControllers.where((element) => element.text.isEmpty).isEmpty &&
+        _correctAnswers.where((element) => element).isNotEmpty;
   }
 
-
-  void submitQuestions(){
+  void submitQuestions() {
     String question = _questionController.text.trim();
-    QuestionOptions option1 = QuestionOptions(text: _optionControllers[0].text.trim(), isCorrect: _correctAnswers[0]);
-    QuestionOptions option2 = QuestionOptions(text: _optionControllers[1].text.trim(), isCorrect: _correctAnswers[1]);
-    QuestionOptions option3 = QuestionOptions(text: _optionControllers[2].text.trim(), isCorrect: _correctAnswers[2]);
-    QuestionOptions option4 = QuestionOptions(text: _optionControllers[3].text.trim(), isCorrect: _correctAnswers[3]);
+    QuestionOptions option1 = QuestionOptions(
+        text: _optionControllers[0].text.trim(), isCorrect: _correctAnswers[0]);
+    QuestionOptions option2 = QuestionOptions(
+        text: _optionControllers[1].text.trim(), isCorrect: _correctAnswers[1]);
+    QuestionOptions option3 = QuestionOptions(
+        text: _optionControllers[2].text.trim(), isCorrect: _correctAnswers[2]);
+    QuestionOptions option4 = QuestionOptions(
+        text: _optionControllers[3].text.trim(), isCorrect: _correctAnswers[3]);
 
-    QuestionData layOutQuestion = QuestionData(question: question, options: [
-      option1,option2,option3,option4
-    ]);
-
+    QuestionData layOutQuestion = QuestionData(
+        question: question, options: [option1, option2, option3, option4]);
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -145,9 +149,9 @@ class _QuizFormState extends State<QuizForm> {
                     print('Correct Answer: ${_correctAnswers[i]}');
                   }
 
-                  if(canSubmit()){
+                  if (canSubmit()) {
                     submitQuestions();
-                  }else{
+                  } else {
                     showSnackBar(context, "Enter all Values");
                   }
                 },

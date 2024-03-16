@@ -10,14 +10,11 @@ import 'package:flutter/services.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-
 bool isAdmin = false;
 String adminEmail = 'admin@gmail.com';
 
 void main() async {
-
   WidgetsFlutterBinding.ensureInitialized();
-
 
   SystemChrome.setPreferredOrientations(
     [
@@ -26,14 +23,12 @@ void main() async {
     ],
   );
 
+  await SupabaseConfig.initialize;
+  await HiveConfig().startHive();
 
-    await SupabaseConfig.initialize;
-    await HiveConfig().startHive();
-
-    await HiveConfig().interface().openBox("userBox");
+  await HiveConfig().interface().openBox("userBox");
 
   runApp(MyApp());
-
 }
 
 bool closeCustomProgressBar(BuildContext context) {
@@ -49,10 +44,10 @@ class SupabaseConfig {
   SupabaseConfig.internal();
 
   static String url = 'https://atxenegeuegtqbqjnlbl.supabase.co';
-  static String apiKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF0eGVuZWdldWVndHFicWpubGJsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDk5ODEzNjQsImV4cCI6MjAyNTU1NzM2NH0.HztUBloaSeUXPVCG9Cj3vU7nRrlcNGxbrC9Snwkk640';
+  static String apiKey =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF0eGVuZWdldWVndHFicWpubGJsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDk5ODEzNjQsImV4cCI6MjAyNTU1NzM2NH0.HztUBloaSeUXPVCG9Cj3vU7nRrlcNGxbrC9Snwkk640';
   static final initialize = Supabase.initialize(url: url, anonKey: apiKey);
   static final client = Supabase.instance.client;
-
 }
 
 class HiveConfig {
@@ -70,21 +65,14 @@ class HiveConfig {
     return await interface().initFlutter();
   }
 
-  Box getBox(String boxName){
+  Box getBox(String boxName) {
     return interface().box(boxName);
   }
-
 }
-
-
-
-
 
 const userBoxName = 'userBox';
 const Color bgColor = Color(0xFF4993FA);
 const Color bgColor3 = Color(0xFF5170FD);
-
-
 
 BuildContext showCustomProgressBar(BuildContext context,
     {var cancelTouch = false}) {
@@ -109,17 +97,17 @@ BuildContext showCustomProgressBar(BuildContext context,
         child: Center(
           child: Platform.isIOS
               ? Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.6),
-                  borderRadius: BorderRadius.circular(8)),
-              child: const CupertinoActivityIndicator(
-                color: Colors.white,
-                radius: 35 / 2,
-              ))
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.6),
+                      borderRadius: BorderRadius.circular(8)),
+                  child: const CupertinoActivityIndicator(
+                    color: Colors.white,
+                    radius: 35 / 2,
+                  ))
               : const CircularProgressIndicator(
-            color: bgColor3,
-          ),
+                  color: bgColor3,
+                ),
         ),
       );
     },
@@ -137,7 +125,6 @@ showDebug({dynamic msg = ''}) {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -154,10 +141,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
-
-class UserDB{
-
-
+class UserDB {
   static Future<bool> updateTheValue(String column, dynamic value,
       {bool forceUpdate = false}) async {
     Box membersBox = HiveConfig().getBox(userBoxName);
@@ -178,32 +162,28 @@ class UserDB{
   }
 
   Future<bool> insertUserRecordBothOnlineAndLocal(
-      String uuid,
-      String studentId,
-      String email) async {
+      String uuid, String studentId, String email) async {
     return await SupabaseConfig.client
         .from("user_table")
         .insert({
-      "id": uuid,
-      "studentId": studentId,
-      "email": email,
-    })
+          "id": uuid,
+          "studentId": studentId,
+          "email": email,
+        })
         .select()
         .maybeSingle()
         .then((userData) {
-      if (userData != null) {
-        saveOnlineUserRecordToLocal(userData);
-      }
-      return true;
-    })
+          if (userData != null) {
+            saveOnlineUserRecordToLocal(userData);
+          }
+          return true;
+        })
         .onError((error, stackTrace) {
-      showDebug(msg: "$error $stackTrace");
+          showDebug(msg: "$error $stackTrace");
 
-      return false;
-    });
+          return false;
+        });
   }
-
-
 
   Future<bool> saveOnlineUserRecordToLocal(dynamic data,
       {bool useOther = false}) async {
@@ -253,5 +233,4 @@ class UserDB{
       return value.every((element) => true);
     }).onError((error, stackTrace) => false);
   }
-
 }

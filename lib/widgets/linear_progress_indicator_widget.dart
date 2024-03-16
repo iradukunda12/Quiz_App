@@ -1,9 +1,8 @@
 import 'dart:async';
-import 'package:flashcards_quiz/views/quiz_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../models/flutter_topics_model.dart';
-import '../models/layout_questions_model.dart';
+import '../views/quiz_screen.dart';
 
 class MyProgressIndicator extends StatefulWidget {
   final List<QuestionData> questionlenght;
@@ -42,10 +41,11 @@ class _MyProgressIndicatorState extends State<MyProgressIndicator> {
   }
 
   void navigateToNewScreen() {
-    Navigator.of(context).pushReplacement(
+    Navigator.pushReplacement(
+      context,
       MaterialPageRoute(
         builder: (context) => QuizScreen(
-          questionData: widget.questionlenght,
+          questions: widget.questionlenght,
           topicType: widget.topicType,
         ),
       ),

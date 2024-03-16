@@ -1,33 +1,13 @@
 import 'package:flashcards_quiz/main.dart';
+import 'package:flashcards_quiz/notifiers/TitleNotifier.dart';
 import 'package:flashcards_quiz/utils/utils.dart';
 import 'package:flashcards_quiz/views/widgetview.dart';
 import 'package:flutter/material.dart';
 
+import '../notifiers/QuestionNotifier.dart';
 import 'registerquestions.dart';
 
 class CategoryView extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Choose The Category',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      home: FormScreen(),
-    );
-  }
-}
-
-class FormScreen extends StatefulWidget {
-  @override
-  _FormScreenState createState() => _FormScreenState();
-}
-
-class _FormScreenState extends State<FormScreen> {
-  String? _selectedCategory;
-
   TextEditingController _categoryController = TextEditingController();
 
   @override
@@ -65,9 +45,7 @@ class _FormScreenState extends State<FormScreen> {
                     width: 2.0,
                   ),
                 ),
-                child:
-
-                TextField(
+                child: TextField(
                   controller: _categoryController,
                   decoration: InputDecoration(
                     hintText: 'Enter your question',
@@ -98,24 +76,25 @@ class _FormScreenState extends State<FormScreen> {
                 //     );
                 //   }).toList(),
                 // ),
-
-
-
-
-
               ),
               SizedBox(height: 20.0),
               ElevatedButton(
                 onPressed: () {
-
-                  if(_categoryController.text.isNotEmpty) {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => WidgetView(_categoryController.text),
-                      ),
-                    );
-                  }else{
+                  if (_categoryController.text.isNotEmpty) {
+                    QuestionNotifier? questionNotifier = TitleNotifier()
+                        .getThisQuestionNotifier(_categoryController.text);
+                    if (questionNotifier != null) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => WidgetView(
+                              _categoryController.text, questionNotifier),
+                        ),
+                      );
+                    } else {
+                      showSnackBar(context, "An error occurred");
+                    }
+                  } else {
                     showSnackBar(context, "Enter the category name");
                   }
                 },

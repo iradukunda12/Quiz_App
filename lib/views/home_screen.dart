@@ -1,21 +1,35 @@
+import 'dart:io';
+
 import 'package:flashcards_quiz/main.dart';
-import 'package:flashcards_quiz/models/flutter_topics_model.dart';
+import 'package:flashcards_quiz/notifiers/TitleNotifier.dart';
 import 'package:flashcards_quiz/views/flashcard_screen.dart';
-import 'package:flashcards_quiz/views/navigation.dart';
 import 'package:flashcards_quiz/views/signup_screen.dart';
-import 'package:flashcards_quiz/views/statemanagement.dart';
 import 'package:flashcards_quiz/views/widgetview.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:quickalert/quickalert.dart';
-
-import 'package:flashcards_quiz/views/results_screen.dart';
+import 'package:widget_state_notifier/widget_state_notifier.dart';
 
 import 'categoryview.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> implements TitleImplement {
+  @override
+  void initState() {
+    super.initState();
+
+    TitleNotifier().start(this);
+  }
+
+  @override
+  BuildContext? get getContext => context;
 
   @override
   Widget build(BuildContext context) {
@@ -33,17 +47,28 @@ class HomePage extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    IconButton(onPressed: (){
-                      showCustomProgressBar(context);
-                      SupabaseConfig.client.auth.signOut().then((value){
-                        closeCustomProgressBar(context);
-                        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=> SignupScreen()),(a) => false);
-                      });
-
-                    }, icon: const Icon(Icons.logout_outlined,color: Colors.red,size: 24,))
+                    IconButton(
+                        onPressed: () {
+                          showCustomProgressBar(context);
+                          SupabaseConfig.client.auth.signOut().then((value) {
+                            closeCustomProgressBar(context);
+                            Navigator.pushAndRemoveUntil(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => const SignupScreen()),
+                                (route) => false);
+                          });
+                        },
+                        icon: const Icon(
+                          Icons.logout_outlined,
+                          color: Colors.red,
+                          size: 24,
+                        ))
                   ],
                 ),
-                const SizedBox(height: 16,),
+                const SizedBox(
+                  height: 16,
+                ),
                 Container(
                   decoration: BoxDecoration(
                     color: bgColor3,
@@ -97,133 +122,168 @@ class HomePage extends StatelessWidget {
                 const SizedBox(
                   height: 10,
                 ),
-                GridView.builder(
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    mainAxisSpacing: 10,
-                    crossAxisSpacing: 10,
-                    childAspectRatio: 0.85,
-                  ),
-                  shrinkWrap: true,
-                  physics: const BouncingScrollPhysics(),
-                  itemCount: flutterTopicsList.length,
-                  itemBuilder: (context, index) {
-                    final topicsData = flutterTopicsList[index];
-                    return GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => NewCard(
-                              topicName: topicsData.topicName, questionData: topicsData.topicQuestions,
-                            ),
+                WidgetStateConsumer(
+                    widgetStateNotifier: TitleNotifier().stateNotifier,
+                    widgetStateBuilder: (context, snapshot) {
+                      if (snapshot == null) {
+                        return SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.4,
+                          child: Center(
+                            child: Platform.isIOS
+                                ? Container(
+                                    padding: const EdgeInsets.all(16),
+                                    decoration: BoxDecoration(
+                                        color: Colors.black.withOpacity(0.6),
+                                        borderRadius: BorderRadius.circular(8)),
+                                    child: const CupertinoActivityIndicator(
+                                      color: Colors.white,
+                                      radius: 35 / 2,
+                                    ))
+                                : const CircularProgressIndicator(
+                                    color: Colors.white,
+                                  ),
                           ),
                         );
-                        print(topicsData.topicName);
-                      },
-                      child: Card(
-                        color: bgColor,
-                        elevation: 10,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                      }
+                      return GridView.builder(
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          mainAxisSpacing: 10,
+                          crossAxisSpacing: 10,
+                          childAspectRatio: 0.85,
                         ),
-                        child: Center(
-                          child: Stack(
-                            children: [
-                              Positioned.fill(
-                                top: 16,
-                                child: Center(
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        topicsData.topicIcon,
-                                        color: Colors.white,
-                                        size: 55,
-                                      ),
-                                      const SizedBox(
-                                        height: 15,
-                                      ),
-                                      Text(
-                                        topicsData.topicName,
-                                        textAlign: TextAlign.center,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .headlineSmall!
-                                            .copyWith(
-                                              fontSize: 18,
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.w300,
-                                            ),
-                                      )
-                                    ],
+                        shrinkWrap: true,
+                        physics: const BouncingScrollPhysics(),
+                        itemCount: snapshot?.length ?? 0,
+                        itemBuilder: (context, index) {
+                          final topicsName = snapshot![index];
+                          final questionNotifier = TitleNotifier()
+                              .getThisQuestionNotifier(topicsName)!;
+
+                          return GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => NewCard(
+                                    topicName: topicsName,
+                                    questionNotifier: questionNotifier,
+                                    // questionData: topicsData.topicQuestions,
                                   ),
                                 ),
+                              );
+                              print(topicsName);
+                            },
+                            child: Card(
+                              color: bgColor,
+                              elevation: 10,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
                               ),
-                              if (isAdmin)
-                                Positioned(
-                                  top: 10,
-                                  right: 0,
-                                  left: 8,
-                                  child: Row(
-                                    children: [
-                                      GestureDetector(
-                                        onTap: () {
-                                          QuickAlert.show(
-                                            context: context,
-                                            type: QuickAlertType.success,
-                                            text:
-                                                'lets check the ${topicsData.topicName} Questions so that we can Edit & Delete & Create!',
-                                            title: topicsData.topicName,
-                                            confirmBtnText: "Okay",
-                                            confirmBtnColor: bgColor3,
-                                            onConfirmBtnTap: () {
-                                              Navigator.pop(context);
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      WidgetView(topicsData.topicName),
-                                                ),
-                                              );
-                                              print("Hello world it's ");
-                                            },
-                                          );
-                                        },
-                                        child: const Icon(
-                                          Icons.menu,
-                                          color: Colors.white,
-                                          size: 30,
+                              child: Center(
+                                child: Stack(
+                                  children: [
+                                    Positioned.fill(
+                                      top: 16,
+                                      child: Center(
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: [
+                                            Icon(
+                                              Icons.ac_unit_sharp,
+                                              color: Colors.white,
+                                              size: 55,
+                                            ),
+                                            const SizedBox(
+                                              height: 15,
+                                            ),
+                                            Text(
+                                              topicsName,
+                                              textAlign: TextAlign.center,
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .headlineSmall!
+                                                  .copyWith(
+                                                    fontSize: 18,
+                                                    color: Colors.white,
+                                                    fontWeight: FontWeight.w300,
+                                                  ),
+                                            )
+                                          ],
                                         ),
                                       ),
-                                    ],
-                                  ),
+                                    ),
+                                    if (isAdmin)
+                                      Positioned(
+                                        top: 10,
+                                        right: 0,
+                                        left: 8,
+                                        child: Row(
+                                          children: [
+                                            GestureDetector(
+                                              onTap: () {
+                                                QuickAlert.show(
+                                                  context: context,
+                                                  type: QuickAlertType.success,
+                                                  text:
+                                                      'lets check the ${topicsName} Questions so that we can Edit & Delete & Create!',
+                                                  title: topicsName,
+                                                  confirmBtnText: "Okay",
+                                                  confirmBtnColor: bgColor3,
+                                                  onConfirmBtnTap: () {
+                                                    Navigator.pop(context);
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            WidgetView(
+                                                                topicsName,
+                                                                questionNotifier),
+                                                      ),
+                                                    );
+                                                    print("Hello world it's ");
+                                                  },
+                                                );
+                                              },
+                                              child: const Icon(
+                                                Icons.menu,
+                                                color: Colors.white,
+                                                size: 30,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                  ],
                                 ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
+                              ),
+                            ),
+                          );
+                        },
+                      );
+                    }),
               ],
             ),
           ),
         ),
-        floatingActionButton: (isAdmin) ? FloatingActionButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => CategoryView(),
-              ),
-            );
-          },
-          backgroundColor: Colors.green,
-          child: const Icon(Icons.add),
-        ) : const SizedBox(),
+        floatingActionButton: (isAdmin)
+            ? FloatingActionButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CategoryView(),
+                    ),
+                  );
+                },
+                backgroundColor: Colors.green,
+                child: const Icon(Icons.add),
+              )
+            : const SizedBox(),
       );
     });
   }
